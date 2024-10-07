@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
 const router = express.Router();
+const errorHandlerMiddleware = require('./errorHandlerMiddleware');
+
+app.use(express.json());
 
 /*
 - Create new html file name home.html 
@@ -8,7 +11,7 @@ const router = express.Router();
 - Return home.html page to client
 */
 router.get('/home', (req,res) => {
-  res.send('This is home router');
+  res.sendFile(path.join(__dirname, 'home.html'));
 });
 
 /*
@@ -46,7 +49,8 @@ router.post('/login', (req,res) => {
     in HTML format like <b>${username} successfully logout.<b>
 */
 router.get('/logout', (req,res) => {
-  res.send('This is logout router');
+  const username = req.query.username;
+  res.send(`<b>${username} successfully logout.<b>`);
 });
 
 /*
@@ -54,10 +58,12 @@ Add error handling middleware to handle below error
 - Return 500 page with message "Server Error"
 */
 app.use((err,req,res,next) => {
-  res.send('This is error router');
+ throw new Error('Server Error');
 });
 
 app.use('/', router);
+
+app.use(errorHandlerMiddleware);
 
 app.listen(process.env.port || 8081);
 
